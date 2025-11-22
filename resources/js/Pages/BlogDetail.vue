@@ -1,6 +1,6 @@
 <template>
   <Head :title="blog?.title || 'Article'" />
-  <div class="sticky top-0 z-20 bg-white border-b">
+  <div class="bg-white border-b">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3">
       <h1 class="text-xl md:text-2xl font-semibold text-[#1a73e8] tracking-tight">{{ blog.title }}</h1>
     </div>

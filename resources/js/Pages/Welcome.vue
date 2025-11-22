@@ -35,7 +35,7 @@
         </div>
 
         <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div v-for="(section, index) in sections" :key="index" class="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition p-6 flex flex-col">
+            <div v-for="(section, index) in sections" :key="index" :ref="el => sectionRefs[index] = el" class="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition p-6 flex flex-col transform-gpu" :class="[isVisible(index) ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2']">
             <div class="flex justify-between items-center mb-4">
                 <div class="flex items-center gap-2 text-gray-800 font-semibold text-sm">
                 <span>{{ section.content_category?.name || "Telusuri topik" }}</span>
@@ -53,15 +53,18 @@
                     </select>
                     <i class="bi bi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
                     </div>
-                    <button @click="downloadData(section)" class="hover:text-gray-800 transition text-lg" title="Download"><i class="bi bi-download"></i></button>
-                    <button @click="openEmbed(section)" class="hover:text-gray-800 transition text-lg" title="View code"><i class="bi bi-code"></i></button>
-                    <button @click="shareData(section, index)" class="hover:text-gray-800 transition text-lg" title="Share data"><i class="bi bi-share-fill"></i></button>
+                    <button @click="downloadData(section)" class="hover:text-gray-800 transition text-lg transition-transform hover:scale-110" title="Download"><i class="bi bi-download"></i></button>
+                    <button @click="openEmbed(section)" class="hover:text-gray-800 transition text-lg transition-transform hover:scale-110" title="View code"><i class="bi bi-code"></i></button>
+                    <button @click="shareData(section, index)" class="hover:text-gray-800 transition text-lg transition-transform hover:scale-110" title="Share data"><i class="bi bi-share-fill"></i></button>
                 </div>
             </div>
 
             <!-- List -->
-            <ul class="divide-y divide-gray-100 flex-grow overflow-auto">
-                <li v-for="(content, idx) in section.content_category?.contents" :key="content.id" class="flex justify-between items-center py-3 hover:bg-gray-50 rounded-lg transition relative">
+            <transition-group name="list" tag="ul" class="divide-y divide-gray-100 flex-grow overflow-y-auto overflow-x-hidden">
+                <li v-if="isLoading" v-for="n in 6" :key="'skeleton-'+n" class="py-3">
+                    <div class="h-5 w-3/4 bg-gray-200 rounded animate-pulse"></div>
+                </li>
+                <li v-else v-for="(content, idx) in section.content_category?.contents" :key="content.id" class="flex justify-between items-center py-3 hover:bg-gray-50 rounded-lg transition relative">
                 <div class="flex items-center gap-4">
                     <span class="text-gray-500 font-semibold w-5 text-center select-none">{{ idx + 1 }}</span>
                     <div>
@@ -91,7 +94,7 @@
                     </transition>
                 </div>
                 </li>
-            </ul>
+            </transition-group>
             </div>
         </div>
 
@@ -251,13 +254,17 @@ const selectedCity = ref(props.filters?.city || "");
 const selectedMonth = ref(props.filters?.month || (new Date().getMonth() + 1));
 
 watch([selectedCategory, selectedCity, selectedMonth], ([category, city, month]) => {
+  isLoading.value = true
   router.post(
     route("home"),
     { category, city, month },
-    { preserveScroll: true, preserveState: true, replace: true }
+    { preserveScroll: true, preserveState: true, replace: true,
+      onFinish: () => { isLoading.value = false }
+    }
   );
 });
 function applyFilter() {
+  isLoading.value = true
   router.post(
     route("home"),
     {
@@ -265,7 +272,9 @@ function applyFilter() {
       city: selectedCity.value,
       month: selectedMonth.value,
     },
-    { preserveScroll: true, preserveState: true, replace: true }
+    { preserveScroll: true, preserveState: true, replace: true,
+      onFinish: () => { isLoading.value = false }
+    }
   );
 }
 
@@ -273,6 +282,10 @@ function applyFilter() {
 const sharePopup = ref({ show: false, section: null });
 const embedPopup = useRemember({ show: false, section: null, device: "desktop" }, "embedPopup");
 const activeMenu = ref(null);
+const isLoading = ref(false)
+const sectionRefs = ref([])
+const visibleSections = ref(new Set())
+function isVisible(i){ return visibleSections.value.has(i) }
 
 function toggleMenu(sectionIndex, itemIndex) {
   if (activeMenu.value?.section === sectionIndex && activeMenu.value?.item === itemIndex) {
@@ -289,6 +302,15 @@ onMounted(() => {
   document.addEventListener("click", (e) => {
     if (!e.target.closest(".relative")) activeMenu.value = null;
   });
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        const idx = sectionRefs.value.indexOf(e.target)
+        if (idx >= 0) visibleSections.value.add(idx)
+      }
+    })
+  }, { threshold: 0.1 })
+  sectionRefs.value.forEach(el => el && obs.observe(el))
 });
 
 /* === SHARE === */
@@ -387,4 +409,6 @@ select.custom-select {
   background-image: none !important;
 }
 select.custom-select::-ms-expand { display: none; }
+.list-enter-active, .list-leave-active { transition: all .2s ease; }
+.list-enter-from, .list-leave-to { opacity: 0; transform: translateY(4px); }
 </style>
