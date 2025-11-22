@@ -24,7 +24,7 @@ use App\Http\Controllers\Blog\BlogFrontController;
 use App\Http\Controllers\Auth\CustomAuthenticatedSessionController;
 
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::match(['get','post'], '/', [HomeController::class, 'index'])->name('home');
 Route::get('/privacy-policy', [FrontPrivacyPolicy::class, 'index'])->name('privacy.index');
 Route::get('/blogs', [BlogFrontController::class, 'index'])->name('blogs.front.index');
 Route::get('/blogs/{slug}', [BlogFrontController::class, 'show'])->name('blogs.front.show');

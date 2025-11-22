@@ -102,8 +102,7 @@
       </ul>
 
       <div class="mt-3 text-xs text-gray-400 text-center">
-        <p>Ranking bulan <span class="font-semibold text-gray-600">{{ currentMonthLabel }}</span></p>
-        <p>Data oleh <span class="font-semibold text-gray-600">TopRank</span></p>
+        <p>Data oleh <span class="font-semibold text-gray-600">MTrends</span></p>
       </div>
     </div>
 

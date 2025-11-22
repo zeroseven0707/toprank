@@ -20,9 +20,10 @@ class HomeController extends Controller
 {
     public function index(Request $request)
     {
-        $selectedCategory = $request->get('category');
-        $selectedCity = $request->get('city') ?? City::where('is_current', true)->value('id');
-        $selectedMonth = $request->get('month') ?? Carbon::now()->month;
+        $filters = $request->session()->get('home.filters', []);
+        $selectedCategory = $request->input('category', $filters['category'] ?? null);
+        $selectedCity = $request->input('city', $filters['city'] ?? City::where('is_current', true)->value('id'));
+        $selectedMonth = $request->input('month', $filters['month'] ?? Carbon::now()->month);
 
         $sections = Section::with([
             'contentCategory.contents' => function ($query) use ($selectedCity, $selectedMonth) {
@@ -57,6 +58,12 @@ class HomeController extends Controller
                 'label' => Carbon::create()->month($m)->translatedFormat('F'),
             ],
         );
+
+        $request->session()->put('home.filters', [
+            'category' => $selectedCategory,
+            'city' => $selectedCity,
+            'month' => $selectedMonth,
+        ]);
 
         return Inertia::render('Welcome', [
             'sections' => $sections,

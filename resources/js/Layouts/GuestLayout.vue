@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 
 import Dropdown from '@/Components/Dropdown.vue'
@@ -13,6 +13,18 @@ defineProps({
 // State
 const showingNavigationDropdown = ref(false)
 const isDark = ref(false)
+function setHeaderOffsetVar() {
+    const h = document.querySelector('header')
+    const val = h ? h.offsetHeight + 'px' : '0px'
+    document.documentElement.style.setProperty('--sticky-header-offset', val)
+}
+onMounted(() => {
+    setHeaderOffsetVar()
+    window.addEventListener('resize', setHeaderOffsetVar)
+})
+onUnmounted(() => {
+    window.removeEventListener('resize', setHeaderOffsetVar)
+})
 
 // Logout
 const logout = () => router.post(route('logout'))
@@ -48,12 +60,13 @@ const toggleDarkMode = () => {
     <div class="min-h-screen bg-[#f1f3f4] dark:bg-[#1e1e1e] font-inter transition-colors duration-300">
 
         <!-- HEADER -->
-        <header class="bg-white dark:bg-[#2a2a2a] dark:border-gray-700 border-b shadow-sm">
+        <header class="bg-white dark:bg-[#2a2a2a] dark:border-gray-700 border-b shadow-sm fixed top-0 left-0 right-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
 
                 <!-- LOGO / TITLE -->
-                <h1 class="text-xl md:text-2xl font-semibold text-[#202124] dark:text-gray-200">
-                    Top Ranks
+                <h1 class="flex items-center gap-2 text-xl md:text-2xl font-semibold text-[#202124] dark:text-gray-200">
+                    <img src="/assets/img/icons/mappy-trends.png" alt="Trends Logo" class="w-10 h-10" />
+                    <span>MTrends</span>
                 </h1>
 
                 <!-- DESKTOP MENU -->
@@ -187,7 +200,7 @@ const toggleDarkMode = () => {
         </header>
 
         <!-- PAGE CONTENT -->
-        <main>
+        <main style="padding-top: var(--sticky-header-offset);">
             <slot />
         </main>
 

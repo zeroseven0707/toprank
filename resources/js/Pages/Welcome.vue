@@ -147,7 +147,7 @@
                     </div>
 
                     <p class="text-xs text-gray-500 pt-4">
-                    Dibuat oleh <span class="font-semibold text-gray-700">TopRank</span>
+                    Dibuat oleh <span class="font-semibold text-gray-700">MTrends</span>
                     </p>
                     </div>
 
@@ -251,14 +251,14 @@ const selectedCity = ref(props.filters?.city || "");
 const selectedMonth = ref(props.filters?.month || (new Date().getMonth() + 1));
 
 watch([selectedCategory, selectedCity, selectedMonth], ([category, city, month]) => {
-  router.get(
+  router.post(
     route("home"),
     { category, city, month },
     { preserveScroll: true, preserveState: true, replace: true }
   );
 });
 function applyFilter() {
-  router.get(
+  router.post(
     route("home"),
     {
       category: selectedCategory.value,

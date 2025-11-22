@@ -3,42 +3,40 @@
   <div class="bg-gray-50 min-h-screen">
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-6 mt-10 mb-20">
-      <h2 class="text-3xl font-bold mb-8 text-gray-800">Artikel Terbaru</h2>
-
-      <!-- Grid Artikel -->
-      <div v-if="blogs && blogs.data && blogs.data.length"
-           class="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-8">
-        <div v-for="blog in blogs.data" :key="blog.id"
-             class="bg-white rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group flex flex-col">
-
-          <!-- Image -->
-          <div class="overflow-hidden rounded-t-2xl">
-            <img v-if="blog.image" :src="blog.image" alt="Blog Image"
-                 class="w-full h-52 object-cover group-hover:scale-105 transition-transform duration-700" />
-          </div>
-
-          <!-- Content -->
-          <div class="p-6 flex flex-col flex-grow">
-            <p v-if="blog.category"
-               class="text-xs font-semibold uppercase tracking-wide text-blue-600 mb-2">
-              {{ blog.category.name }}
-            </p>
-            <h2 class="text-xl font-semibold text-gray-800 group-hover:text-blue-600 transition mb-2 leading-tight">
-              {{ blog.title }}
-            </h2>
-            <div class="text-gray-400 text-xs mb-3">
-              {{ blog.author || 'Admin' }} • {{ new Date(blog.created_at).toLocaleDateString() }}
+      <div v-if="blogs && blogs.data && blogs.data.length">
+        <div class="mb-8">
+          <Link v-if="featuredBlog" :href="route('blogs.front.show', featuredBlog.slug)" class="relative block rounded-2xl overflow-hidden bg-white/80 border border-gray-100 shadow-sm hover:shadow-md transition group">
+            <img v-if="featuredBlog.image" :src="featuredBlog.image" class="w-full h-72 md:h-96 object-cover group-hover:scale-105 transition" />
+            <div v-else class="w-full h-72 md:h-96 bg-gray-200"></div>
+            <div class="absolute inset-x-0 bottom-0 p-6 bg-gradient-to-t from-black/60 via-black/20 to-transparent text-white">
+              <p v-if="featuredBlog.category" class="text-xs uppercase tracking-wide mb-2">{{ featuredBlog.category.name }}</p>
+              <h2 class="text-2xl md:text-3xl font-bold mb-2">{{ featuredBlog.title }}</h2>
+              <div class="text-sm opacity-90">{{ new Date(featuredBlog.created_at).toLocaleDateString() }}</div>
             </div>
-            <p class="text-gray-600 text-sm line-clamp-3 flex-grow">
-              {{ blog.excerpt }}
-            </p>
-            <div class="mt-4">
-              <Link :href="route('blogs.front.show', blog.slug)"
-                    class="text-blue-600 hover:text-blue-800 font-medium transition-all">
-                Baca Selengkapnya →
-              </Link>
-            </div>
+          </Link>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="md:col-span-2 space-y-6">
+            <Link v-for="blog in otherBlogs" :key="blog.id" :href="route('blogs.front.show', blog.slug)" class="bg-white/80 rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition overflow-hidden flex">
+              <img v-if="blog.image" :src="blog.image" class="w-40 h-32 object-cover hidden sm:block" />
+              <div class="p-5 flex-1">
+                <p v-if="blog.category" class="text-xs font-semibold uppercase text-blue-600/80 mb-1">{{ blog.category.name }}</p>
+                <h3 class="text-lg font-semibold text-gray-800">{{ blog.title }}</h3>
+                <div class="text-gray-400 text-xs mb-2">{{ new Date(blog.created_at).toLocaleDateString() }}</div>
+                <p class="text-gray-600 text-sm line-clamp-2">{{ blog.excerpt }}</p>
+              </div>
+            </Link>
           </div>
+          <aside class="space-y-4">
+            <h4 class="text-sm font-semibold text-gray-700">Trending</h4>
+            <Link v-for="blog in otherBlogs.slice(0,5)" :key="blog.id" :href="route('blogs.front.show', blog.slug)" class="flex gap-3 bg-white/80 rounded-xl border border-gray-100 p-3 hover:bg-gray-50">
+              <img v-if="blog.image" :src="blog.image" class="w-14 h-14 object-cover rounded-md" />
+              <div class="flex-1">
+                <span class="text-sm font-medium text-gray-800 line-clamp-2">{{ blog.title }}</span>
+              </div>
+            </Link>
+          </aside>
         </div>
       </div>
 
@@ -74,10 +72,14 @@
 
 <script setup>
 import { Link, router, Head } from "@inertiajs/vue3";
+import { computed } from "vue";
 
-defineProps({
+const { blogs } = defineProps({
   blogs: { type: Object, required: true },
 });
+
+const featuredBlog = computed(() => blogs?.data?.[0] || null)
+const otherBlogs = computed(() => (blogs?.data || []).slice(1))
 
 function visitPage(page) {
   router.visit(route("blogs.front.index"), {

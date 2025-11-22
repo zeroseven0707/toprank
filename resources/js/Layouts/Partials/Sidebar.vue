@@ -3,10 +3,10 @@
     <!-- Logo / Brand -->
     <div class="app-brand demo">
       <Link href="/" class="app-brand-link">
-        <span class="app-brand-logo demo">
-          <!-- SVG LOGO -->
+        <span class="app-brand-logo">
+            <img src="/assets/img/icons/mappy-trends.png" alt="Trends Logo" class="w-10 h-10" />
         </span>
-        <span class="app-brand-text demo menu-text fw-bold">Meat Map</span>
+        <span class="app-brand-text demo menu-text fw-bold">MTrends</span>
       </Link>
 
       <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto" @click.prevent="toggleSidebar">

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Apify;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\RunCrawlJob;
+use App\Jobs\StartCrawlJob;
 use App\Models\Content;
 use App\Models\UrlCrawl;
 use App\Models\CrawlData;
@@ -19,8 +20,7 @@ class CrawlController extends Controller
         $config->update(['status' => 'queued']);
 
         try {
-            RunCrawlJob::dispatch($id);
-
+            StartCrawlJob::dispatch($id);
             return back()->with('success', "Crawl untuk {$config->name} telah dijadwalkan di background queue 🚀");
         } catch (\Throwable $e) {
             Log::error('Gagal dispatch Crawl Job', ['error' => $e->getMessage()]);
@@ -35,7 +35,8 @@ class CrawlController extends Controller
             foreach ($urlCrawls as $crawl) {
                 $crawl->update(['status' => 'running']);
 
-                RunCrawlJob::dispatch($crawl->id);
+                StartCrawlJob::dispatch($crawl->id);
+
             }
 
             return back()->with('success', 'Semua URL Crawl sedang dijalankan!');
