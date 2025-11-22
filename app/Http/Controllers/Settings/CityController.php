@@ -48,6 +48,7 @@ class CityController extends Controller
         $request->validate([
             'name' => 'required|string|unique:cities,name,' . $city->id,
             'status' => 'required|in:active,inactive',
+            'is_current' => 'nullable|boolean',
         ]);
 
         $city->update($request->all());
@@ -60,5 +61,12 @@ class CityController extends Controller
         $city->delete();
 
         return redirect()->route('cities.index')->with('success', 'City deleted successfully.');
+    }
+
+    public function makeDefault(City $city)
+    {
+        City::where('is_current', true)->update(['is_current' => false]);
+        $city->update(['is_current' => true]);
+        return redirect()->route('cities.index')->with('success', 'Default city updated.');
     }
 }

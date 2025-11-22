@@ -2,7 +2,7 @@
   <div class="container-xxl flex-grow-1 container-p-y">
     <!-- Header + Filter -->
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h4 class="fw-bold text-2xl mb-0">Crawl Data</h4>
+      <h4 class="d-none d-md-block fw-bold text-2xl mb-0">Crawl Data</h4>
 
       <!-- ✅ Filter Bulan -->
       <div class="d-flex align-items-center gap-2">
@@ -21,96 +21,98 @@
     <!-- Table Section -->
     <div class="card shadow-sm rounded-4">
       <div class="card-body p-0">
-        <table class="table table-hover mb-0">
-          <thead class="table-light">
-            <tr>
-              <th>#</th>
-              <th>Nama Crawl</th>
-              <th>Jumlah Data</th>
-              <th>Scraped At (Terakhir)</th>
-              <th class="text-center">Aksi</th>
-            </tr>
-          </thead>
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>#</th>
+                  <th>Nama Crawl</th>
+                  <th>Jumlah Data</th>
+                  <th>Scraped At (Terakhir)</th>
+                  <th class="text-center">Aksi</th>
+                </tr>
+              </thead>
 
-          <tbody>
-            <tr
-              v-for="(group, index) in groupedCrawls"
-              :key="group.id"
-              @click="toggleGroup(group.id)"
-              style="cursor: pointer;"
-            >
-              <td>{{ index + 1 + (crawls.current_page - 1) * crawls.per_page }}</td>
-              <td>{{ group.name ?? group.url ?? '-' }}</td>
-              <td>{{ group.items.length }}</td>
-              <td>{{ formatDate(group.last_scraped_at) }}</td>
-              <td class="text-center">
-                <button
-                  class="btn btn-sm btn-outline-primary rounded-pill px-3"
-                  @click.stop="toggleGroup(group.id)"
+              <tbody>
+                <tr
+                  v-for="(group, index) in groupedCrawls"
+                  :key="group.id"
+                  @click="toggleGroup(group.id)"
+                  style="cursor: pointer;"
                 >
-                  {{ expandedGroups.includes(group.id) ? 'Tutup' : 'Lihat Detail' }}
-                </button>
-              </td>
-            </tr>
+                  <td>{{ index + 1 + (crawls.current_page - 1) * crawls.per_page }}</td>
+                  <td>{{ group.name ?? group.url ?? '-' }}</td>
+                  <td>{{ group.items.length }}</td>
+                  <td>{{ formatDate(group.last_scraped_at) }}</td>
+                  <td class="text-center">
+                    <button
+                      class="btn btn-sm btn-outline-primary rounded-pill px-3"
+                      @click.stop="toggleGroup(group.id)"
+                    >
+                      {{ expandedGroups.includes(group.id) ? 'Tutup' : 'Lihat Detail' }}
+                    </button>
+                  </td>
+                </tr>
 
-            <!-- Detail -->
-            <tr
-              v-for="group in groupedCrawls"
-              v-show="expandedGroups.includes(group.id)"
-              :key="'details-' + group.id"
-            >
-              <td colspan="6" class="bg-light">
-                <div class="p-3 border rounded">
-                  <h6 class="fw-bold mb-3 text-primary">
-                    Detail Data Crawl ({{ group.items.length }} items)
-                  </h6>
-                  <div class="table-responsive">
-                    <table class="table table-sm table-striped">
-                      <thead>
-                        <tr>
-                          <th>#</th>
-                          <th>Owner</th>
-                          <th>Username</th>
-                          <th>Caption</th>
-                          <th>Likes</th>
-                          <th>Komentar</th>
-                          <th>Aksi</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr v-for="(item, i) in group.items" :key="item.id">
-                          <td>{{ i + 1 }}</td>
-                          <td>{{ item.ownerFullName ?? '-' }}</td>
-                          <td>{{ item.ownerUsername ?? '-' }}</td>
-                          <td class="truncate" :title="item.caption">
-                            {{ item.caption?.substring(0, 70) ?? '-' }}
-                            {{ item.caption?.length > 70 ? '...' : '' }}
-                          </td>
-                          <td>{{ item.likesCount ?? 0 }}</td>
-                          <td>{{ item.commentsCount ?? 0 }}</td>
-                          <td>
-                            <button
-                              class="btn btn-sm btn-outline-info rounded-pill px-3 me-2"
-                              @click="showMetadata(item)"
-                            >
-                              Metadata
-                            </button>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </td>
-            </tr>
+                <!-- Detail -->
+                <tr
+                  v-for="group in groupedCrawls"
+                  v-show="expandedGroups.includes(group.id)"
+                  :key="'details-' + group.id"
+                >
+                  <td colspan="6" class="bg-light">
+                    <div class="p-3 border rounded">
+                      <h6 class="fw-bold mb-3 text-primary">
+                        Detail Data Crawl ({{ group.items.length }} items)
+                      </h6>
+                      <div class="table-responsive">
+                        <table class="table table-sm table-striped">
+                          <thead>
+                            <tr>
+                              <th>#</th>
+                              <th>Owner</th>
+                              <th>Username</th>
+                              <th>Caption</th>
+                              <th>Likes</th>
+                              <th>Komentar</th>
+                              <th>Aksi</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="(item, i) in group.items" :key="item.id">
+                              <td>{{ i + 1 }}</td>
+                              <td>{{ item.ownerFullName ?? '-' }}</td>
+                              <td>{{ item.ownerUsername ?? '-' }}</td>
+                              <td class="truncate" :title="item.caption">
+                                {{ item.caption?.substring(0, 70) ?? '-' }}
+                                {{ item.caption?.length > 70 ? '...' : '' }}
+                              </td>
+                              <td>{{ item.likesCount ?? 0 }}</td>
+                              <td>{{ item.commentsCount ?? 0 }}</td>
+                              <td>
+                                <button
+                                  class="btn btn-sm btn-outline-info rounded-pill px-3 me-2"
+                                  @click="showMetadata(item)"
+                                >
+                                  Metadata
+                                </button>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  </td>
+                </tr>
 
-            <tr v-if="!crawls.data.length">
-              <td colspan="6" class="text-center py-4 text-muted">
-                Belum ada data crawl untuk periode ini.
-              </td>
-            </tr>
-          </tbody>
-        </table>
+                <tr v-if="!crawls.data.length">
+                  <td colspan="6" class="text-center py-4 text-muted">
+                    Belum ada data crawl untuk periode ini.
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+        </div>
       </div>
     </div>
 

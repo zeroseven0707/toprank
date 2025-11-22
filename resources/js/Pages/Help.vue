@@ -3,7 +3,7 @@ import { Head } from '@inertiajs/vue3'
 </script>
 
 <template>
-    <Head title="Help" />
+    <Head title="Help Center" />
 
     <div class="max-w-3xl mx-auto py-10 px-6">
         <h1 class="text-3xl font-bold text-gray-800 mb-4">Help Center</h1>

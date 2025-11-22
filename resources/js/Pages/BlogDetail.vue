@@ -1,4 +1,5 @@
 <template>
+  <Head :title="blog?.title || 'Article'" />
   <div class="max-w-4xl mx-auto px-4 py-12">
     <img
       v-if="blog.image"
@@ -30,7 +31,7 @@
 </template>
 
 <script setup>
-import { Link } from "@inertiajs/vue3";
+import { Link, Head } from "@inertiajs/vue3";
 defineProps({ blog: Object });
 </script>
 

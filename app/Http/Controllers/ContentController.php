@@ -11,30 +11,29 @@ use Inertia\Inertia;
 
 class ContentController extends Controller
 {
-public function index(Request $request)
-{
-    $period = $request->get('period');
-    $category = $request->get('category');
-    $city = $request->get('city');
+    public function index(Request $request)
+    {
+        $period = $request->get('period') ?? now()->format('Y-m');
+        $category = $request->get('category');
+        $city = $request->get('city');
 
-    $contents = Content::with(['category', 'city'])
-        ->when($period, function ($q) use ($period) {
-            [$year, $month] = explode('-', $period);
-            $q->whereYear('created_at', $year)->whereMonth('created_at', $month);
-        })
-        ->when($category, fn($q) => $q->where('category_content_id', $category))
-        ->when($city, fn($q) => $q->where('city', $city))
-        ->paginate(10);
+        $contents = Content::with(['category', 'city'])
+            ->when($period, function ($q) use ($period) {
+                [$year, $month] = explode('-', $period);
+                $q->whereYear('created_at', $year)->whereMonth('created_at', $month);
+            })
+            ->when($category, fn($q) => $q->where('category_content_id', $category))
+            ->when($city, fn($q) => $q->where('city', $city))
+            ->paginate(10);
 
-    return inertia('Content/Index', [
-        'contents' => $contents,
-        'period' => $period,
-        'categories' => ContentCategory::select('id', 'name')->get(),
-        'cities' => City::select('id', 'name')->get(),
-        'filters' => compact('period', 'category', 'city'),
-    ]);
-}
-
+        return inertia('Content/Index', [
+            'contents' => $contents,
+            'period' => $period,
+            'categories' => ContentCategory::select('id', 'name')->get(),
+            'cities' => City::select('id', 'name')->get(),
+            'filters' => compact('period', 'category', 'city'),
+        ]);
+    }
     /**
      * Form tambah / edit konten
      */
@@ -56,6 +55,17 @@ public function index(Request $request)
         $period = now()->format('Y-m');
         Content::where('period', $period)->update(['published' => true]);
         return redirect()->route('content.index')->with('success', 'Konten berhasil di publish.');
+    }
+
+    public function publishSelected(Request $request)
+    {
+        $ids = $request->input('ids', []);
+        if (!is_array($ids) || empty($ids)) {
+            return back()->with('error', 'Tidak ada konten yang dipilih.');
+        }
+        $published = $request->boolean('published', true);
+        Content::whereIn('id', $ids)->update(['published' => $published]);
+        return back()->with('success', $published ? 'Konten terpilih berhasil di publish.' : 'Konten terpilih diubah ke draft.');
     }
 
     /**
@@ -90,7 +100,6 @@ public function index(Request $request)
             'maps_link' => 'required|string',
             'image' => 'nullable|string',
             'description' => 'nullable|string',
-            'rank' => ['required', 'integer', 'min:1', \Illuminate\Validation\Rule::unique('contents')->ignore($content->id)->where(fn($q) => $q->where('category_content_id', $request->category_content_id))],
         ]);
 
         $content->update($validated);
@@ -110,6 +119,10 @@ public function index(Request $request)
     {
         $selectedCity = $request->get('city');
         $selectedMonth = $request->get('month');
+
+        if (!$selectedCity) {
+            $selectedCity = City::select('id')->orderBy('id')->value('id');
+        }
 
         // Ambil kategori + kontennya
         $category = ContentCategory::with([

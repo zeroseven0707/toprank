@@ -31,11 +31,6 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Rank</label>
-                        <input v-model="form.rank" type="number" min="1" class="form-control" readonly />
-                    </div>
-
-                    <div class="mb-3">
                         <label class="form-label fw-semibold">Maps Link</label>
                         <input v-model="form.maps_link" type="text" class="form-control" required />
                     </div>

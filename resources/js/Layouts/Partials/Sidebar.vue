@@ -1,15 +1,15 @@
 <template>
-  <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+  <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme d-flex flex-column">
     <!-- Logo / Brand -->
     <div class="app-brand demo">
       <Link href="/" class="app-brand-link">
         <span class="app-brand-logo demo">
           <!-- SVG LOGO -->
         </span>
-        <span class="app-brand-text demo menu-text fw-bold">Top Rank</span>
+        <span class="app-brand-text demo menu-text fw-bold">Meat Map</span>
       </Link>
 
-      <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+      <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto" @click.prevent="toggleSidebar">
         <i class="ti menu-toggle-icon d-none d-xl-block align-middle"></i>
         <i class="ti ti-x d-block d-xl-none ti-md align-middle"></i>
       </a>
@@ -134,13 +134,24 @@ const visibleMenu = computed(() => {
   return filtered;
 });
 
-// 📂 Menu aktif / terbuka
-const isOpen = (item) =>
-  item.children?.some((child) => page.url.includes(child.route)) || false;
+// 📂 Menu aktif / terbuka (reactive)
+const currentPath = computed(() => (page.url || '').split('?')[0].replace(/\/+$/, ''));
+const segmentMatch = (route) => {
+  const base = String(route || '').split('?')[0].replace(/\/+$/, '');
+  return currentPath.value === base || currentPath.value.startsWith(base + '/');
+};
+const isOpen = (item) => item.children?.some((child) => segmentMatch(child.route)) || false;
 
 // 🔹 Aktif
-const isActive = (route) =>
-  page.url === route || page.url.startsWith(route);
+const isActive = (route) => segmentMatch(route);
+
+function toggleSidebar() {
+  const html = document.documentElement;
+  if (typeof window !== 'undefined' && window.Helpers && typeof window.Helpers.toggleCollapsed !== 'undefined') {
+    try { window.Helpers.toggleCollapsed(); return } catch (e) {}
+  }
+  html.classList.toggle('layout-menu-expanded');
+}
 </script>
 
 <style scoped>
@@ -165,4 +176,9 @@ const isActive = (route) =>
   background-color: rgba(13, 110, 253, 0.05);
   color: #0d6efd;
 }
+.layout-menu { height: 100vh; }
+.layout-menu .menu-inner { flex: 1 1 auto; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: rgba(0,0,0,.15) transparent; }
+.layout-menu .menu-inner::-webkit-scrollbar { width: 6px; }
+.layout-menu .menu-inner::-webkit-scrollbar-track { background: transparent; }
+.layout-menu .menu-inner::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,.15); border-radius: 8px; }
 </style>

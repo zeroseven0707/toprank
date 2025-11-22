@@ -1,5 +1,4 @@
-<!-- resources/js/Layouts/AdminLayout.vue -->
-<template>
+<template title="Admin Layout">
   <div class="layout-wrapper layout-content-navbar">
     <div class="layout-container">
       <!-- Sidebar -->
@@ -17,6 +16,7 @@
 
           <!-- Footer -->
           <Footer />
+          <div class="content-backdrop fade"></div>
         </div>
       </div>
     </div>

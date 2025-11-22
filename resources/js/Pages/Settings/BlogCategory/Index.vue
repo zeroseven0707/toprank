@@ -7,29 +7,36 @@
 
     <div class="card shadow-sm border-0">
       <div class="card-body">
-        <table class="table table-striped">
-          <thead class="table-light">
-            <tr>
-              <th>No</th>
-              <th>Name</th>
-              <th>Description</th>
-              <th>Status</th>
-              <th class="text-center">Action</th>
-            </tr>
-          </thead>
-          <tbody>
+        <div class="table-responsive">
+          <table class="table table-striped table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th class="d-none d-sm-table-cell" style="width:80px">No</th>
+                <th>Name</th>
+                <th class="d-none d-md-table-cell">Description</th>
+                <th class="text-center" style="width:120px">Action</th>
+              </tr>
+            </thead>
+            <tbody
+>
             <tr v-for="(category, index) in categories.data" :key="category.id">
-              <td>{{ index + 1 }}</td>
-              <td>{{ category.name }}</td>
-              <td>{{ category.description || '-' }}</td>
-              <td>
-                <span :class="category.status === 'active' ? 'badge bg-success' : 'badge bg-secondary'">
-                  {{ category.status }}
-                </span>
-              </td>
-              <td class="text-center">
-                <Link :href="`/settings/blog-categories/${category.id}/edit`" class="btn btn-sm btn-warning me-2">Edit</Link>
-                <button @click="destroy(category.id)" class="btn btn-sm btn-danger">Delete</button>
+              <td class="d-none d-sm-table-cell">{{ index + 1 }}</td>
+              <td class="text-break">{{ category.name }}</td>
+              <td class="d-none d-md-table-cell">{{ category.description || '-' }}</td>
+              <td class="text-center position-relative">
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-light" @click.stop="toggleMenu(category.id)">
+                    <i class="ti ti-dots-vertical"></i>
+                  </button>
+                  <div v-if="openMenuId === category.id" class="dropdown-menu show" style="position:absolute; right:0; z-index:10;">
+                    <Link :href="`/settings/blog-categories/${category.id}/edit`" class="dropdown-item">
+                      <i class="ti ti-edit me-1"></i> Edit
+                    </Link>
+                    <button @click.prevent="destroy(category.id)" class="dropdown-item text-danger">
+                      <i class="ti ti-trash me-1"></i> Delete
+                    </button>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -45,20 +52,26 @@
       </div>
     </div>
   </div>
+  </div>
 </template>
 
 <script setup>
 import { Link, router } from '@inertiajs/vue3'
+import { ref } from 'vue'
 
 defineProps({ categories: Object })
 
+const openMenuId = ref(null)
+const toggleMenu = (id) => { openMenuId.value = openMenuId.value === id ? null : id }
+document.addEventListener('click', (e) => { if (!e.target.closest('.dropdown')) openMenuId.value = null })
+
 const visitPage = (page) => {
-  router.visit(route('blog-categories.index'), { data: { page }, preserveScroll: true, preserveState: true });
+  router.visit(route('blog-categories.index'), { data: { page }, preserveScroll: true, preserveState: true })
 }
 
 const destroy = (id) => {
   if (confirm('Are you sure to delete this category?')) {
-    router.delete(route('blog-categories.destroy', id));
+    router.delete(route('blog-categories.destroy', id))
   }
 }
 </script>

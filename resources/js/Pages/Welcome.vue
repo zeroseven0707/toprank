@@ -1,243 +1,239 @@
 <template>
+    <Head title="Home" />
     <main class="max-w-7xl mx-auto px-6 mt-8">
-      <div class="w-full rounded-xl p-4">
-        <textarea placeholder="Tambahkan istilah penelusuran" rows="2" class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-[#1a73e8] focus:border-[#1a73e8] text-gray-800 text-lg resize-none shadow-sm"></textarea>
+        <div class="w-full rounded-xl p-4">
+            <div class="mt-4 flex flex-wrap gap-3 bg-white p-3 rounded-lg border border-gray-200">
+                <select
+                v-model="selectedCity"
+                @change="applyFilter"
+                class="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-[#1a73e8] cursor-pointer"
+                >
+                <option v-for="city in cities" :key="city.id" :value="city.id">
+                    {{ city.name }}
+                </option>
+                </select>
 
-        <div class="mt-4 flex flex-wrap gap-3 bg-white p-3 rounded-lg border border-gray-200">
-            <select
-            v-model="selectedCity"
-            @change="applyFilter"
-            class="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-[#1a73e8] cursor-pointer"
-            >
-            <option v-for="city in cities" :key="city.id" :value="city.id">
-                {{ city.name }}
-            </option>
-            </select>
-
-            <select
-            v-model="selectedMonth"
-            class="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-[#1a73e8] cursor-pointer"
-            >
-            <option value="">Semua Bulan</option>
-            <option v-for="month in months" :key="month.value" :value="month.value">
-                {{ month.label }}
-            </option>
-            </select>
-
-            <select
-            v-model="selectedCategory"
-            class="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-[#1a73e8] cursor-pointer"
-            >
-            <option value="">Semua Kategori</option>
-            <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                {{ cat.name }}
-            </option>
-            </select>
-        </div>
-      </div>
-
-      <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div v-for="(section, index) in sections" :key="index" class="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition p-6 flex flex-col">
-          <div class="flex justify-between items-center mb-4">
-            <div class="flex items-center gap-2 text-gray-800 font-semibold text-sm">
-              <span>{{ section.content_category?.name || "Telusuri topik" }}</span>
-            </div>
-            <div class="flex items-center gap-3 text-gray-600">
                 <select
                 v-model="selectedMonth"
-                @change="applyFilter"
-                class="border border-gray-300 rounded-lg text-sm px-3 py-1.5 text-gray-700 cursor-pointer"
+                class="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-[#1a73e8] cursor-pointer"
                 >
-                <option value="">Bulan ini</option>
                 <option v-for="month in months" :key="month.value" :value="month.value">
                     {{ month.label }}
                 </option>
                 </select>
-                <button @click="downloadData(section)" class="hover:text-gray-800 transition text-lg" title="Download"><i class="bi bi-download"></i></button>
-                <button @click="openEmbed(section)" class="hover:text-gray-800 transition text-lg" title="View code"><i class="bi bi-code"></i></button>
-                <button @click="shareData(section, index)" class="hover:text-gray-800 transition text-lg" title="Share data"><i class="bi bi-share-fill"></i></button>
-            </div>
-          </div>
 
-          <!-- List -->
-          <ul class="divide-y divide-gray-100 flex-grow overflow-auto">
-            <li v-for="(content, idx) in section.content_category?.contents" :key="content.id" class="flex justify-between items-center py-3 hover:bg-gray-50 rounded-lg transition relative">
-              <div class="flex items-center gap-4">
-                <span class="text-gray-500 font-semibold w-5 text-center select-none">{{ idx + 1 }}</span>
-                <div>
-                  <p class="text-gray-800 font-medium leading-tight">{{ content.name }}</p>
+                <select
+                v-model="selectedCategory"
+                class="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2 text-gray-700 text-sm focus:ring-2 focus:ring-[#1a73e8] cursor-pointer"
+                >
+                <option value="">Semua Kategori</option>
+                <option v-for="cat in categories" :key="cat.id" :value="cat.id">
+                    {{ cat.name }}
+                </option>
+                </select>
+            </div>
+        </div>
+
+        <div class="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div v-for="(section, index) in sections" :key="index" class="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition p-6 flex flex-col">
+            <div class="flex justify-between items-center mb-4">
+                <div class="flex items-center gap-2 text-gray-800 font-semibold text-sm">
+                <span>{{ section.content_category?.name || "Telusuri topik" }}</span>
                 </div>
-              </div>
-
-              <!-- 3 Dots Menu -->
-              <div class="relative">
-                <button @click="toggleMenu(index, idx)" class="text-gray-400 hover:text-gray-600"><i class="bi bi-three-dots-vertical"></i></button>
-
-                <transition name="fade">
-                  <div v-if="activeMenu?.section === index && activeMenu?.item === idx" class="absolute right-0 mt-2 w-36 bg-white border border-gray-200 rounded-md shadow-md z-50">
-                    <ul class="text-sm text-gray-700">
-                      <li>
-                        <button @click="goToMaps(content)" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2">
-                          <i class="bi bi-geo-alt text-gray-500"></i>Go to Maps
-                        </button>
-                      </li>
-                      <li>
-                        <button @click="copyLink(content)" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2">
-                          <i class="bi bi-link-45deg text-gray-500"></i>Copy Link
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
-                </transition>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- Popup SHARE -->
-      <transition name="fade">
-        <div v-if="sharePopup.show" class="fixed inset-0 bg-black/40 flex justify-center items-center z-50" @click.self="sharePopup.show = false">
-          <div class="bg-white rounded-xl shadow-lg p-6 w-64">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center">Bagikan ke</h3>
-            <div class="flex justify-center gap-4 text-2xl text-gray-600">
-              <button @click="shareTo('wa', sharePopup.section)" class="hover:text-green-500"><i class="bi bi-whatsapp"></i></button>
-              <button @click="shareTo('telegram', sharePopup.section)" class="hover:text-sky-500"><i class="bi bi-telegram"></i></button>
-              <button @click="shareTo('twitter', sharePopup.section)" class="hover:text-blue-400"><i class="bi bi-twitter"></i></button>
-              <button @click="shareTo('copy', sharePopup.section)" class="hover:text-gray-800"><i class="bi bi-link-45deg"></i></button>
+                <div class="flex items-center gap-3 text-gray-600">
+                    <div class="relative">
+                    <select
+                    v-model="selectedMonth"
+                    @change="applyFilter"
+                    class="custom-select min-w-[160px] border border-gray-300 rounded-lg text-sm px-3 pr-8 py-1.5 text-gray-700 cursor-pointer bg-white"
+                    >
+                    <option v-for="month in months" :key="month.value" :value="month.value">
+                        {{ month.label }}
+                    </option>
+                    </select>
+                    <i class="bi bi-chevron-down absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"></i>
+                    </div>
+                    <button @click="downloadData(section)" class="hover:text-gray-800 transition text-lg" title="Download"><i class="bi bi-download"></i></button>
+                    <button @click="openEmbed(section)" class="hover:text-gray-800 transition text-lg" title="View code"><i class="bi bi-code"></i></button>
+                    <button @click="shareData(section, index)" class="hover:text-gray-800 transition text-lg" title="Share data"><i class="bi bi-share-fill"></i></button>
+                </div>
             </div>
-            <button @click="sharePopup.show = false" class="mt-6 w-full py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 font-medium">Tutup</button>
-          </div>
-        </div>
-      </transition>
 
-    <transition name="fade">
-    <div
-        v-if="embedPopup.show"
-        class="fixed inset-0 bg-black/40 flex justify-center items-center z-50"
-        @click.self="embedPopup.show = false"
-    >
+            <!-- List -->
+            <ul class="divide-y divide-gray-100 flex-grow overflow-auto">
+                <li v-for="(content, idx) in section.content_category?.contents" :key="content.id" class="flex justify-between items-center py-3 hover:bg-gray-50 rounded-lg transition relative">
+                <div class="flex items-center gap-4">
+                    <span class="text-gray-500 font-semibold w-5 text-center select-none">{{ idx + 1 }}</span>
+                    <div>
+                    <p class="text-gray-800 font-medium leading-tight">{{ content.name }}</p>
+                    </div>
+                </div>
+
+                <!-- 3 Dots Menu -->
+                <div class="relative">
+                    <button @click="toggleMenu(index, idx)" class="text-gray-400 hover:text-gray-600"><i class="bi bi-three-dots-vertical"></i></button>
+
+                    <transition name="fade">
+                    <div v-if="activeMenu?.section === index && activeMenu?.item === idx" class="absolute right-0 mt-2 w-36 bg-white border border-gray-200 rounded-md shadow-md z-50">
+                        <ul class="text-sm text-gray-700">
+                        <li>
+                            <button @click="goToMaps(content)" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2">
+                            <i class="bi bi-geo-alt text-gray-500"></i>Go to Maps
+                            </button>
+                        </li>
+                        <li>
+                            <button @click="copyLink(content)" class="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2">
+                            <i class="bi bi-link-45deg text-gray-500"></i>Copy Link
+                            </button>
+                        </li>
+                        </ul>
+                    </div>
+                    </transition>
+                </div>
+                </li>
+            </ul>
+            </div>
+        </div>
+
+        <!-- Popup SHARE -->
+        <transition name="fade">
+            <div v-if="sharePopup.show" class="fixed inset-0 bg-black/40 flex justify-center items-center z-50" @click.self="sharePopup.show = false">
+            <div class="bg-white rounded-xl shadow-lg p-6 w-64">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center">Bagikan ke</h3>
+                <div class="flex justify-center gap-4 text-2xl text-gray-600">
+                <button @click="shareTo('wa', sharePopup.section)" class="hover:text-green-500"><i class="bi bi-whatsapp"></i></button>
+                <button @click="shareTo('telegram', sharePopup.section)" class="hover:text-sky-500"><i class="bi bi-telegram"></i></button>
+                <button @click="shareTo('twitter', sharePopup.section)" class="hover:text-blue-400"><i class="bi bi-twitter"></i></button>
+                <button @click="shareTo('copy', sharePopup.section)" class="hover:text-gray-800"><i class="bi bi-link-45deg"></i></button>
+                </div>
+                <button @click="sharePopup.show = false" class="mt-6 w-full py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 font-medium">Tutup</button>
+            </div>
+            </div>
+        </transition>
+
+        <transition name="fade">
         <div
-        class="bg-white rounded-lg shadow-lg flex overflow-hidden font-inter"
-        style="width: 880px; height: 520px;"
+            v-if="embedPopup.show"
+            class="fixed inset-0 bg-black/40 flex justify-center items-center z-50"
+            @click.self="embedPopup.show = false"
         >
-        <!-- ░ Panel kiri: SEMATKAN ░ -->
-        <div class="w-[35%] bg-[#f8f9fa] border-r border-gray-200 p-5 flex flex-col">
-            <h3 class="text-base font-semibold text-gray-600 mb-2">Sematkan</h3>
-            <p class="text-sm text-gray-400 mb-4 leading-snug">
-            Data ini dinamis dan akan terus diperbarui.
-            </p>
-
-            <div class="mt-auto">
-            <label class="text-sm font-medium text-gray-400 mb-2 block">
-            Salin kode ini ke halaman HTML Anda:
-            </label>
-            <div class="relative">
-            <textarea
-                readonly
-                rows="8"
-                class="w-full border border-gray-300 rounded-md p-2 text-xs font-mono text-gray-700 bg-white resize-none"
-                :value="generateEmbedCode(embedPopup.section)"
-            ></textarea>
-            <button
-                @click="copyEmbedCode(embedPopup.section)"
-                class="absolute top-1 right-1 bg-secondary text-white text-[11px] px-3 py-1 rounded"
-            >
-                Salin
-            </button>
-            </div>
-
-            <p class="text-xs text-gray-500 pt-4">
-            Dibuat oleh <span class="font-semibold text-gray-700">TopRank</span>
-            </p>
-            </div>
-
-        </div>
-
-        <!-- ░ Panel kanan: PRATINJAU ░ -->
-        <div class="flex-1 flex flex-col bg-white">
-            <!-- Header -->
-            <div class="border-b border-gray-200 flex justify-between items-center px-5 py-2">
-            <div class="flex items-center gap-5">
-                <h3 class="text-base font-semibold text-gray-800">Pratinjau</h3>
-                <div class="flex items-center gap-3 text-sm">
-                <button
-                    :class="[
-                    embedPopup.device === 'desktop'
-                        ? 'text-[#1a73e8] border-b-2 border-[#1a73e8]'
-                        : 'text-gray-500',
-                    'pb-[2px] font-medium',
-                    ]"
-                    @click="embedPopup.device = 'desktop'"
-                >
-                    DESKTOP
-                </button>
-                <button
-                    :class="[
-                    embedPopup.device === 'mobile'
-                        ? 'text-[#1a73e8] border-b-2 border-[#1a73e8]'
-                        : 'text-gray-500',
-                    'pb-[2px] font-medium',
-                    ]"
-                    @click="embedPopup.device = 'mobile'"
-                >
-                    SELULER
-                </button>
-                </div>
-            </div>
-
-            <button
-                @click="embedPopup.show = false"
-                class="text-gray-400 hover:text-gray-700 text-base"
-            >
-                <i class="bi bi-x-lg"></i>
-            </button>
-            </div>
-
-            <!-- Preview area -->
-            <div class="flex-grow bg-[#f8f9fa] flex items-center justify-center py-6">
             <div
-                class="bg-white border border-gray-300 rounded-md shadow-inner overflow-hidden"
-                :class="embedPopup.device === 'desktop' ? 'w-[640px] h-[360px]' : 'w-[360px] h-[640px]'"
+            class="bg-white rounded-lg shadow-lg flex flex-col md:flex-row overflow-hidden font-inter w-full max-w-[880px] max-h-[90vh]"
             >
+                <!-- ░ Panel kiri: SEMATKAN ░ -->
+                <div class="w-full md:w-[35%] bg-[#f8f9fa] border-b md:border-b-0 md:border-r border-gray-200 p-4 md:p-5 flex flex-col overflow-auto">
+                    <h3 class="text-base font-semibold text-gray-600 mb-2">Sematkan</h3>
+                    <p class="text-sm text-gray-400 mb-4 leading-snug">
+                    Data ini dinamis dan akan terus diperbarui.
+                    </p>
 
-                <iframe
-                :src="getEmbedUrl(embedPopup.section)"
-                class="w-full h-full"
-                frameborder="0"
-                allowfullscreen
-                ></iframe>
+                    <div class="mt-auto">
+                    <label class="text-sm font-medium text-gray-400 mb-2 block">
+                    Salin kode ini ke halaman HTML Anda:
+                    </label>
+                    <div class="relative">
+                    <textarea
+                        readonly
+                        rows="8"
+                        class="w-full border border-gray-300 rounded-md p-2 text-xs font-mono text-gray-700 bg-white resize-none"
+                        :value="generateEmbedCode(embedPopup.section)"
+                    ></textarea>
+                    <button
+                        @click="copyEmbedCode(embedPopup.section)"
+                        class="absolute top-1 right-1 bg-secondary text-white text-[11px] px-3 py-1 rounded"
+                    >
+                        Salin
+                    </button>
+                    </div>
 
-                <div
-                class="border-t border-gray-200 px-4 py-1.5 text-[11px] text-gray-500 text-left bg-gray-50"
-                >
-                Indonesia. 12 bulan terakhir. Penelusuran Web.
+                    <p class="text-xs text-gray-500 pt-4">
+                    Dibuat oleh <span class="font-semibold text-gray-700">TopRank</span>
+                    </p>
+                    </div>
+
+                </div>
+                <!-- ░ Panel kanan: PRATINJAU ░ -->
+                <div class="flex-1 flex flex-col bg-white overflow-auto">
+                    <!-- Header -->
+                    <div class="border-b border-gray-200 flex justify-between items-center px-5 py-2">
+                    <div class="flex items-center gap-5">
+                        <h3 class="text-base font-semibold text-gray-800">Pratinjau</h3>
+                        <div class="flex items-center gap-3 text-sm">
+                        <button
+                            :class="[
+                            embedPopup.device === 'desktop'
+                                ? 'text-[#1a73e8] border-b-2 border-[#1a73e8]'
+                                : 'text-gray-500',
+                            'pb-[2px] font-medium',
+                            ]"
+                            @click="embedPopup.device = 'desktop'"
+                        >
+                            DESKTOP
+                        </button>
+                        <button
+                            :class="[
+                            embedPopup.device === 'mobile'
+                                ? 'text-[#1a73e8] border-b-2 border-[#1a73e8]'
+                                : 'text-gray-500',
+                            'pb-[2px] font-medium',
+                            ]"
+                            @click="embedPopup.device = 'mobile'"
+                        >
+                            SELULER
+                        </button>
+                        </div>
+                    </div>
+
+                    <button
+                        @click="embedPopup.show = false"
+                        class="text-gray-400 hover:text-gray-700 text-base"
+                    >
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    </div>
+
+                    <!-- Preview area -->
+                    <div class="flex-grow bg-[#f8f9fa] flex items-center justify-center py-6">
+                    <div
+                        class="bg-white border border-gray-300 rounded-md shadow-inner overflow-hidden"
+                        :class="embedPopup.device === 'desktop' ? 'w-[640px] h-[360px]' : 'w-[360px] h-[640px]'"
+                    >
+
+                        <iframe
+                        :src="getEmbedUrl(embedPopup.section)"
+                        class="w-full h-full"
+                        frameborder="0"
+                        allowfullscreen
+                        ></iframe>
+
+                        <div
+                        class="border-t border-gray-200 px-4 py-1.5 text-[11px] text-gray-500 text-left bg-gray-50"
+                        >
+                        Indonesia. 12 bulan terakhir. Penelusuran Web.
+                        </div>
+                    </div>
+                    </div>
+
+
+                    <!-- Footer -->
+                    <div class="border-t border-gray-200 px-5 py-2 text-right">
+                    <button
+                        @click="embedPopup.show = false"
+                        class="text-[#1a73e8] text-sm font-semibold hover:underline"
+                    >
+                        SELESAI
+                    </button>
+                    </div>
                 </div>
             </div>
-            </div>
-
-
-            <!-- Footer -->
-            <div class="border-t border-gray-200 px-5 py-2 text-right">
-            <button
-                @click="embedPopup.show = false"
-                class="text-[#1a73e8] text-sm font-semibold hover:underline"
-            >
-                SELESAI
-            </button>
-            </div>
         </div>
-        </div>
-    </div>
-    </transition>
-
+        </transition>
     </main>
-
 </template>
 
 <script setup>
 import * as XLSX from "xlsx";
-import { Link, router } from "@inertiajs/vue3";
+import { Link, router, useRemember, Head } from "@inertiajs/vue3";
 import { ref, onMounted, watch } from "vue";
 
 
@@ -252,7 +248,7 @@ const props = defineProps({
 // Default dari server
 const selectedCategory = ref(props.filters?.category || "");
 const selectedCity = ref(props.filters?.city || "");
-const selectedMonth = ref(props.filters?.month || "");
+const selectedMonth = ref(props.filters?.month || (new Date().getMonth() + 1));
 
 watch([selectedCategory, selectedCity, selectedMonth], ([category, city, month]) => {
   router.get(
@@ -275,7 +271,7 @@ function applyFilter() {
 
 
 const sharePopup = ref({ show: false, section: null });
-const embedPopup = ref({ show: false, section: null, device: "desktop" });
+const embedPopup = useRemember({ show: false, section: null, device: "desktop" }, "embedPopup");
 const activeMenu = ref(null);
 
 function toggleMenu(sectionIndex, itemIndex) {
@@ -323,10 +319,16 @@ function shareTo(platform, section) {
 }
 
 function openEmbed(section) {
-  embedPopup.value = { show: true, section, device: "desktop" };
+  embedPopup.value.show = true;
+  embedPopup.value.section = section;
 }
 function getEmbedUrl(section) {
-  return `/embed/${section.content_category?.id}`;
+  const base = `/embed/${section.content_category?.id}`;
+  const params = new URLSearchParams();
+  if (selectedCity.value) params.append("city", selectedCity.value);
+  if (selectedMonth.value) params.append("month", selectedMonth.value);
+  const qs = params.toString();
+  return qs ? `${base}?${qs}` : base;
 }
 function generateEmbedCode(section) {
   const url = window.location.origin + getEmbedUrl(section);
@@ -377,4 +379,12 @@ function copyLink(content) {
 .fade-leave-to {
   opacity: 0;
 }
+
+select.custom-select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: none !important;
+}
+select.custom-select::-ms-expand { display: none; }
 </style>

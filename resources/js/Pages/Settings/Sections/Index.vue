@@ -18,6 +18,10 @@
     </form>
 
     <!-- Drag & Drop List -->
+    <div class="alert alert-info d-flex align-items-center gap-2 mb-3">
+      <i class="ti ti-hand-move"></i>
+      <span>Tarik dan lepaskan (drag & drop) untuk mengatur urutan sections.</span>
+    </div>
     <draggable v-model="sections" item-key="id" @end="onReorder" class="space-y-3">
       <template #item="{ element, index }">
         <div
@@ -35,19 +39,20 @@
               {{ element.status }}
             </span>
           </div>
-          <div class="flex gap-2">
-            <button
-              @click="editSection(element)"
-              class="btn btn-sm btn-warning flex items-center gap-1"
-            >
-              <i class="ti ti-edit"></i> Edit
-            </button>
-            <button
-              @click="deleteSection(element.id)"
-              class="btn btn-sm btn-danger flex items-center gap-1"
-            >
-              <i class="ti ti-trash"></i> Delete
-            </button>
+          <div class="position-relative">
+            <div class="dropdown">
+              <button class="btn btn-sm btn-light" @click.stop="toggleMenu(element.id)">
+                <i class="ti ti-dots-vertical"></i>
+              </button>
+              <div v-if="openMenuId === element.id" class="dropdown-menu show" style="position:absolute; right:0; z-index:10;">
+                <button class="dropdown-item" @click.prevent="editSection(element)">
+                  <i class="ti ti-edit me-1"></i> Edit
+                </button>
+                <button class="dropdown-item text-danger" @click.prevent="deleteSection(element.id)">
+                  <i class="ti ti-trash me-1"></i> Delete
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </template>
@@ -163,6 +168,10 @@ const onReorder = () => {
   const order = sections.value.map((s) => s.id);
   router.post("/settings/sections/reorder", { order }, { onSuccess: reloadSections });
 };
+
+const openMenuId = ref(null)
+const toggleMenu = (id) => { openMenuId.value = openMenuId.value === id ? null : id }
+document.addEventListener('click', (e) => { if (!e.target.closest('.dropdown')) openMenuId.value = null })
 </script>
 
 <style scoped>

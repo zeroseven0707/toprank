@@ -14,6 +14,7 @@ class City extends Model
         'name',
         'slug',
         'status',
+        'is_current',
     ];
 
     public static function boot()

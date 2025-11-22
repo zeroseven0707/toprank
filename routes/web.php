@@ -28,7 +28,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/privacy-policy', [FrontPrivacyPolicy::class, 'index'])->name('privacy.index');
 Route::get('/blogs', [BlogFrontController::class, 'index'])->name('blogs.front.index');
 Route::get('/blogs/{slug}', [BlogFrontController::class, 'show'])->name('blogs.front.show');
-Route::get('/embed/{id}', [ContentController::class, 'embed']);
+Route::get('/embed/{id}', [ContentController::class, 'embed'])->name('embed.view');
 
 Route::middleware(['auth'])->group(function () {
     // Route::autoPermission()->group(function () {
@@ -107,8 +107,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/data-crawling', [DataCrawlController::class, 'store'])->name('contents.store');
 
         Route::get('/content', [ContentController::class, 'index'])->name('content.index');
-        Route::get('/content', [ContentController::class, 'index'])->name('content.index');
         Route::post('/content/publish', [ContentController::class, 'publish'])->name('content.publish');
+        Route::post('/content/publish-selected', [ContentController::class, 'publishSelected'])->name('content.publish.selected');
         Route::get('/content/{content}/edit', [ContentController::class, 'create'])->name('content.create');
         Route::put('/content/{content}/edit', [ContentController::class, 'update'])->name('content.update');
 
@@ -124,6 +124,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/cities/{city}/edit', [CityController::class, 'edit'])->name('cities.edit');
         Route::put('/cities/{city}', [CityController::class, 'update'])->name('cities.update');
         Route::delete('/cities/{city}', [CityController::class, 'destroy'])->name('cities.destroy');
+        Route::post('/cities/{city}/default', [CityController::class, 'makeDefault'])->name('cities.default');
 
         // blog category
         Route::get('/blog-categories', [BlogCategoryController::class, 'index'])->name('blog-categories.index');

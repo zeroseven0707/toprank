@@ -2,12 +2,8 @@
 import { ref } from 'vue'
 import { Head, Link, router } from '@inertiajs/vue3'
 
-import ApplicationMark from '@/Components/ApplicationMark.vue'
-import Banner from '@/Components/Banner.vue'
 import Dropdown from '@/Components/Dropdown.vue'
 import DropdownLink from '@/Components/DropdownLink.vue'
-import NavLink from '@/Components/NavLink.vue'
-import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue'
 
 // Props
 defineProps({
@@ -18,14 +14,8 @@ defineProps({
 const showingNavigationDropdown = ref(false)
 const isDark = ref(false)
 
-// ----------------------------------------------------
-// FUNCTIONS
-// ----------------------------------------------------
-
 // Logout
-const logout = () => {
-    router.post(route('logout'))
-}
+const logout = () => router.post(route('logout'))
 
 // Share
 const handleShare = async () => {
@@ -35,112 +25,80 @@ const handleShare = async () => {
                 title: document.title,
                 url: window.location.href,
             })
-        } catch (error) {
-            console.log('Share cancelled')
-        }
+        } catch {}
     } else {
-        alert('Browser kamu tidak mendukung fitur share.')
+        alert('Browser tidak mendukung fitur share.')
     }
 }
 
-// Go to Help Page
-const handleHelp = () => {
-    router.visit('/help')
-}
+// Help
+const handleHelp = () => router.visit('/help')
 
 // Toggle Dark Mode
 const toggleDarkMode = () => {
     isDark.value = !isDark.value
-
-    if (isDark.value) {
-        document.documentElement.classList.add('dark')
-    } else {
-        document.documentElement.classList.remove('dark')
-    }
+    document.documentElement.classList.toggle('dark', isDark.value)
 }
 </script>
+
 
 <template>
     <Head :title="title" />
 
     <div class="min-h-screen bg-[#f1f3f4] dark:bg-[#1e1e1e] font-inter transition-colors duration-300">
 
-        <!-- Header -->
-        <header class="bg-white dark:bg-[#2a2a2a] dark:border-gray-700 border-b shadow-sm transition-colors duration-300">
-            <div class="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center">
+        <!-- HEADER -->
+        <header class="bg-white dark:bg-[#2a2a2a] dark:border-gray-700 border-b shadow-sm">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
 
-                <!-- Logo + Title -->
-                <h1 class="text-2xl font-semibold text-[#202124] tracking-tight flex items-center gap-1">
+                <!-- LOGO / TITLE -->
+                <h1 class="text-xl md:text-2xl font-semibold text-[#202124] dark:text-gray-200">
                     Top Ranks
-                    <!-- <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg"
-                         alt="Google"
-                         class="h-6" /> -->
-                    <!-- <span>Trends</span> -->
                 </h1>
 
-                <!-- Navigation -->
-                <nav class="flex gap-8 text-sm text-gray-700 dark:text-gray-200 font-medium">
-                    <Link href="/" class="hover:text-[#1a73e8] transition"
-                          active-class="text-[#1a73e8] border-b-2 border-[#1a73e8] pb-1">
+                <!-- DESKTOP MENU -->
+                <nav class="hidden md:flex gap-8 text-sm text-gray-700 dark:text-gray-200 font-medium">
+                    <Link href="/" class="hover:text-[#1a73e8]" active-class="text-[#1a73e8] font-semibold">
                         Beranda
                     </Link>
-                    <Link href="/blogs" class="hover:text-[#1a73e8] transition"
-                          active-class="text-[#1a73e8] border-b-2 border-[#1a73e8] pb-1">
+                    <Link href="/blogs" class="hover:text-[#1a73e8]" active-class="text-[#1a73e8] font-semibold">
                         Blog
                     </Link>
-                    <Link href="/privacy-policy" class="hover:text-[#1a73e8] transition"
-                          active-class="text-[#1a73e8] border-b-2 border-[#1a73e8] pb-1">
+                    <Link href="/privacy-policy" class="hover:text-[#1a73e8]" active-class="text-[#1a73e8] font-semibold">
                         Privacy Policy
                     </Link>
                 </nav>
 
-                <!-- Right Buttons -->
-                <div class="flex items-center gap-4">
-
-                    <!-- Share -->
-                    <button @click="handleShare"
-                            aria-label="Share" title="Share"
-                            class="text-gray-600 hover:text-[#1a73e8] transition text-lg">
+                <!-- ACTION BUTTONS (DESKTOP) -->
+                <div class="hidden md:flex items-center gap-4 text-gray-600 dark:text-gray-300">
+                    <button @click="handleShare" class="hover:text-[#1a73e8] text-lg">
                         <i class="bi bi-share-fill"></i>
                     </button>
 
-                    <!-- Help -->
-                    <button @click="handleHelp"
-                            aria-label="Help" title="Help"
-                            class="text-gray-600 hover:text-[#1a73e8] transition text-lg">
+                    <button @click="handleHelp" class="hover:text-[#1a73e8] text-lg">
                         <i class="bi bi-question-circle"></i>
                     </button>
 
-                    <!-- Dark Mode -->
-                    <button @click="toggleDarkMode"
-                            aria-label="Dark Mode" title="Toggle Dark Mode"
-                            class="text-gray-600 hover:text-[#1a73e8] transition text-lg">
+                    <button @click="toggleDarkMode" class="hover:text-[#1a73e8] text-lg">
                         <i v-if="!isDark" class="bi bi-moon-stars"></i>
                         <i v-else class="bi bi-brightness-high"></i>
                     </button>
 
-                    <!-- User Dropdown -->
+                    <!-- USER -->
                     <div v-if="$page.props.auth.user">
                         <Dropdown align="right" width="48">
                             <template #trigger>
-                                <button class="rounded-full w-8 h-8 bg-[#6c63ff] text-white font-semibold flex justify-center items-center cursor-pointer select-none">
+                                <button class="rounded-full w-8 h-8 bg-indigo-500 text-white font-semibold flex items-center justify-center">
                                     {{ $page.props.auth.user.name.charAt(0).toUpperCase() }}
                                 </button>
                             </template>
 
                             <template #content>
-                                <div class="px-4 py-2 text-xs text-gray-400">
-                                    Manage Account
-                                </div>
-
                                 <DropdownLink :href="route('profile.show')">
                                     Profile
                                 </DropdownLink>
 
-                                <DropdownLink
-                                    v-if="$page.props.jetstream?.hasApiFeatures"
-                                    :href="route('api-tokens.index')"
-                                >
+                                <DropdownLink v-if="$page.props.jetstream?.hasApiFeatures" :href="route('api-tokens.index')">
                                     API Tokens
                                 </DropdownLink>
 
@@ -155,20 +113,83 @@ const toggleDarkMode = () => {
                         </Dropdown>
                     </div>
 
-                    <!-- If guest -->
                     <div v-else>
-                        <Link href="/login" class="text-sm text-gray-700 underline">
-                            <button class="btn btn-outline-dark text-primary">Login</button>
+                        <Link href="/login">
+                            <button class="inline-flex items-center border border-gray-300 rounded-md px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50">Login</button>
+                        </Link>
+                    </div>
+                </div>
+
+                <!-- MOBILE HAMBURGER -->
+                <button
+                    class="md:hidden text-gray-700 dark:text-gray-200 text-2xl rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    @click="showingNavigationDropdown = !showingNavigationDropdown"
+                >
+                    <i :class="[showingNavigationDropdown ? 'bi bi-x-lg' : 'bi bi-list']"></i>
+                </button>
+
+            </div>
+
+            <!-- MOBILE MENU -->
+            <div
+                class="md:hidden bg-white dark:bg-[#2a2a2a] border-t dark:border-gray-700 overflow-hidden transition-all duration-300"
+                :class="showingNavigationDropdown ? 'max-h-96 py-3' : 'max-h-0 py-0'"
+            >
+                <div class="px-4 sm:px-6 flex flex-col gap-4 text-gray-700 dark:text-gray-200">
+
+                    <Link href="/" class="hover:text-[#1a73e8]" @click="showingNavigationDropdown = false">
+                        Beranda
+                    </Link>
+
+                    <Link href="/blogs" class="hover:text-[#1a73e8]" @click="showingNavigationDropdown = false">
+                        Blog
+                    </Link>
+
+                    <Link href="/privacy-policy" class="hover:text-[#1a73e8]" @click="showingNavigationDropdown = false">
+                        Privacy Policy
+                    </Link>
+
+                    <hr class="border-gray-300 dark:border-gray-600">
+
+                    <div class="flex gap-4 text-lg">
+
+                        <button @click="handleShare" class="hover:text-[#1a73e8]">
+                            <i class="bi bi-share-fill"></i>
+                        </button>
+
+                        <button @click="handleHelp" class="hover:text-[#1a73e8]">
+                            <i class="bi bi-question-circle"></i>
+                        </button>
+
+                        <button @click="toggleDarkMode" class="hover:text-[#1a73e8]">
+                            <i v-if="!isDark" class="bi bi-moon-stars"></i>
+                            <i v-else class="bi bi-brightness-high"></i>
+                        </button>
+                    </div>
+
+                    <div v-if="$page.props.auth.user">
+                        <button
+                            @click="logout"
+                            class="text-left text-red-500 font-medium">
+                            Log Out
+                        </button>
+                    </div>
+
+                    <div v-else>
+                        <Link href="/login" class="inline-flex items-center justify-center w-full border border-gray-300 rounded-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            Login
                         </Link>
                     </div>
 
                 </div>
             </div>
+
         </header>
 
-        <!-- Page Content -->
+        <!-- PAGE CONTENT -->
         <main>
             <slot />
         </main>
+
     </div>
 </template>

@@ -10,52 +10,50 @@
         <h5 class="card-title mb-0">User List</h5>
       </div>
 
-      <div class="text-nowrap">
-        <table class="table table-responsive table-striped align-middle">
+        <table class="table table-striped table-hover table-responsive align-middle mb-0">
           <thead class="table-light">
             <tr>
-              <th>No</th>
+              <th class="d-none d-sm-table-cell">No</th>
               <th>Nama</th>
               <th>Email</th>
-              <th>Role</th>
+              <th class="d-none d-md-table-cell">Role</th>
               <th class="text-center">Action</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="(user, index) in users" :key="user.id">
-              <td>{{ index + 1 }}</td>
+              <td class="d-none d-sm-table-cell">{{ index + 1 }}</td>
               <td>{{ user.name }}</td>
-              <td>{{ user.email }}</td>
-              <td>{{ user.roles.length ? user.roles.map(r => r.name).join(', ') : '-' }}</td>
-                <td class="text-center position-relative">
-  <div class="dropdown">
-    <!-- Tombol titik 3 -->
-    <button class="btn btn-sm btn-light" @click="toggleMenu(user.id)">
-      <i class="ti ti-dots-vertical"></i>
-    </button>
+              <td class="text-break">{{ user.email }}</td>
+              <td class="d-none d-md-table-cell">{{ user.roles.length ? user.roles.map(r => r.name).join(', ') : '-' }}</td>
+                <td class="text-center text-nowrap position-relative">
+                <div class="dropdown">
+                    <!-- Tombol titik 3 -->
+                    <button class="btn btn-sm btn-light" @click="toggleMenu(user.id)">
+                    <i class="ti ti-dots-vertical"></i>
+                    </button>
 
-    <!-- Menu dropdown -->
-    <div
-      v-if="openMenuId === user.id"
-      class="dropdown-menu show"
-      style="position:absolute; right:0; z-index:10;"
-    >
-      <a class="dropdown-item" href="#" @click.prevent="openAssignModal(user)">
-        <i class="ti ti-user-check me-1"></i> Assign
-      </a>
-      <a class="dropdown-item" href="#" @click.prevent="editUser(user)">
-        <i class="ti ti-edit me-1"></i> Edit
-      </a>
-      <a class="dropdown-item text-danger" href="#" @click.prevent="deleteUser(user.id)">
-        <i class="ti ti-trash me-1"></i> Hapus
-      </a>
-    </div>
-  </div>
-</td>
+                    <!-- Menu dropdown -->
+                    <div
+                    v-if="openMenuId === user.id"
+                    class="dropdown-menu show"
+                    style="position:absolute; right:0; z-index:10;"
+                    >
+                    <a class="dropdown-item" href="#" @click.prevent="openAssignModal(user)">
+                        <i class="ti ti-user-check me-1"></i> Assign
+                    </a>
+                    <a class="dropdown-item" href="#" @click.prevent="editUser(user)">
+                        <i class="ti ti-edit me-1"></i> Edit
+                    </a>
+                    <a class="dropdown-item text-danger" href="#" @click.prevent="deleteUser(user.id)">
+                        <i class="ti ti-trash me-1"></i> Hapus
+                    </a>
+                    </div>
+                </div>
+            </td>
             </tr>
           </tbody>
         </table>
-      </div>
     </div>
 
     <!-- Assign Role Modal -->
@@ -189,7 +187,8 @@ const deleteUser = (id) => {
 
 <style scoped>
 .table-responsive {
-  max-height: 600px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .fade-enter-active,

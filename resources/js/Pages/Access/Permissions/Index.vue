@@ -1,17 +1,25 @@
 <template>
-    <div>
-        <h1 class="text-2xl font-bold mb-4">Permission Management</h1>
-        <form @submit.prevent="createPermission" class="mb-5 flex gap-2">
-            <input v-model="form.name" placeholder="Permission name" class="border px-2 py-1 rounded" />
-            <button type="submit" class="bg-blue-500 text-white px-3 py-1 rounded">Add</button>
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4">
+            <span class="text-muted fw-light">Admin /</span> Permission Management
+        </h4>
+
+        <form @submit.prevent="createPermission" class="d-flex flex-wrap gap-2 mb-4">
+            <input v-model="form.name" placeholder="Permission name" class="form-control flex-grow-1" />
+            <button type="submit" class="btn btn-primary">Add</button>
         </form>
 
-        <ul>
-            <li v-for="p in permissions" :key="p.id" class="flex justify-between border-b py-2">
-                <span>{{ p . name }}</span>
-                <button @click="deletePermission(p.id)" class="text-red-600">🗑️</button>
-            </li>
-        </ul>
+        <div class="card">
+            <div class="card-body">
+                <ul class="list-group">
+                    <li v-for="p in permissions" :key="p.id" class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-break">{{ p . name }}</span>
+                        <button @click="deletePermission(p.id)" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </li>
+                </ul>
+                <div v-if="!permissions.length" class="text-center text-muted py-3">No permissions found.</div>
+            </div>
+        </div>
     </div>
 </template>
 

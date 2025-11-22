@@ -4,7 +4,7 @@
     id="layout-navbar"
   >
     <div class="layout-menu-toggle navbar-nav align-items-xl-center me-3 me-xl-0 d-xl-none">
-      <a class="nav-item nav-link px-0 me-xl-4" href="javascript:void(0)">
+      <a class="nav-item nav-link px-0 me-xl-4 layout-menu-toggle" href="javascript:void(0)" @click.prevent="toggleSidebar">
         <i class="ti ti-menu-2 ti-md"></i>
       </a>
     </div>
@@ -18,7 +18,7 @@
             href="javascript:void(0);"
           >
             <i class="ti ti-search ti-md me-2 me-lg-4 ti-lg"></i>
-            <span class="d-none d-md-inline-block text-muted fw-normal">Search (Ctrl+/)</span>
+            <span class="d-none d-lg-inline-block text-muted fw-normal">Search (Ctrl+/)</span>
           </a>
         </div>
       </div>
@@ -33,7 +33,7 @@
             data-bs-toggle="dropdown"
           >
             <div class="avatar avatar-online">
-              <img src="/assets/img/avatars/1.png" alt class="rounded-circle" />
+              <img src="/assets/img/avatars/1.png" alt="" class="rounded-circle" />
             </div>
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
@@ -42,7 +42,7 @@
                 <div class="d-flex align-items-center">
                   <div class="flex-shrink-0 me-2">
                     <div class="avatar avatar-online">
-                      <img src="/assets/img/avatars/1.png" alt class="rounded-circle" />
+                      <img src="/assets/img/avatars/1.png" alt="" class="rounded-circle" />
                     </div>
                   </div>
                   <div class="flex-grow-1">
@@ -81,11 +81,19 @@
 </template>
 
 <script setup>
-import { Link, usePage, router } from "@inertiajs/vue3"; // ✅ tambahkan router
+import { Link, usePage, router } from "@inertiajs/vue3";
 const page = usePage();
 const user = page.props.auth?.user;
 
 function logout() {
   router.post(route("logout"));
+}
+
+function toggleSidebar() {
+  const html = document.documentElement;
+  if (typeof window !== 'undefined' && window.Helpers && typeof window.Helpers.toggleCollapsed !== 'undefined') {
+    try { window.Helpers.toggleCollapsed(); return } catch (e) {}
+  }
+  html.classList.toggle('layout-menu-expanded');
 }
 </script>

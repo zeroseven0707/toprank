@@ -69,15 +69,21 @@
                                     {{ item . status }}
                                 </span>
                             </td>
-                            <td>{{ item . last_run_at ? formatDate(item . last_run_at) : '-' }}</td>
-                            <td class="text-end">
-                                <button @click="runCrawl(item.id)" class="btn btn-sm btn-success me-2"
-                                    :disabled="item.status === 'running'">
-                                    <i class="ti ti-player-play"></i> Run
-                                </button>
-                                <button @click="deleteCrawl(item.id)" class="btn btn-sm btn-danger">
-                                    <i class="ti ti-trash"></i>
-                                </button>
+                            <td class="d-md-table-cell">{{ item . last_run_at ? formatDate(item . last_run_at) : '-' }}</td>
+                            <td class="text-end position-relative">
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-light" @click.stop="toggleMenu(item.id)">
+                                        <i class="ti ti-dots-vertical"></i>
+                                    </button>
+                                    <div v-if="openMenuId === item.id" class="dropdown-menu show" style="position:absolute; right:0; z-index:10;">
+                                        <button @click.prevent="runCrawl(item.id)" class="dropdown-item" :disabled="item.status === 'running'">
+                                            <i class="ti ti-player-play me-1"></i> Run
+                                        </button>
+                                        <button @click.prevent="deleteCrawl(item.id)" class="dropdown-item text-danger">
+                                            <i class="ti ti-trash me-1"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
                             </td>
                         </tr>
 
@@ -171,4 +177,8 @@
     }
 
     const formatDate = (date) => dayjs(date).format('DD MMM YYYY HH:mm')
+
+    const openMenuId = ref(null)
+    const toggleMenu = (id) => { openMenuId.value = openMenuId.value === id ? null : id }
+    document.addEventListener('click', (e) => { if (!e.target.closest('.dropdown')) openMenuId.value = null })
 </script>

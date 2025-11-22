@@ -1,27 +1,32 @@
 <template>
-    <div>
-        <h1 class="text-2xl font-bold mb-4">User Role & Permission Assignment</h1>
+    <div class="container-xxl flex-grow-1 container-p-y">
+        <h4 class="fw-bold py-3 mb-4">
+            <span class="text-muted fw-light">Admin /</span> Assign Roles & Permissions
+        </h4>
 
-        <div v-for="user in users" :key="user.id" class="border p-4 rounded mb-4">
-            <h2 class="font-semibold mb-2">{{ user . name }} ({{ user . email }})</h2>
+        <div v-for="user in users" :key="user.id" class="card mb-4">
+            <div class="card-body">
+                <h2 class="h6 mb-3">{{ user . name }} ({{ user . email }})</h2>
 
-            <div class="mb-2">
-                <label>Roles:</label>
-                <select v-model="userRoles[user.id]" multiple class="border rounded p-1 w-full">
-                    <option v-for="r in roles" :value="r.name" :key="r.id">{{ r . name }}</option>
-                </select>
-                <button @click="saveRoles(user.id)" class="bg-green-500 text-white px-3 py-1 mt-2 rounded">Save
-                    Roles</button>
-            </div>
+                <div class="mb-3">
+                    <label class="form-label">Roles</label>
+                    <select v-model="userRoles[user.id]" multiple class="form-select">
+                        <option v-for="r in roles" :value="r.name" :key="r.id">{{ r . name }}</option>
+                    </select>
+                    <div class="mt-2 d-flex justify-content-end">
+                        <button @click="saveRoles(user.id)" class="btn btn-success btn-sm">Save Roles</button>
+                    </div>
+                </div>
 
-            <div>
-                <label>Permissions:</label>
-                <select v-model="userPermissions[user.id]" multiple class="border rounded p-1 w-full">
-                    <option v-for="p in permissions" :value="p.name" :key="p.id">{{ p . name }}
-                    </option>
-                </select>
-                <button @click="savePermissions(user.id)" class="bg-green-500 text-white px-3 py-1 mt-2 rounded">Save
-                    Permissions</button>
+                <div>
+                    <label class="form-label">Permissions</label>
+                    <select v-model="userPermissions[user.id]" multiple class="form-select">
+                        <option v-for="p in permissions" :value="p.name" :key="p.id">{{ p . name }}</option>
+                    </select>
+                    <div class="mt-2 d-flex justify-content-end">
+                        <button @click="savePermissions(user.id)" class="btn btn-success btn-sm">Save Permissions</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

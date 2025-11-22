@@ -6,10 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Blog;
 use App\Models\BlogCategory;
 use App\Models\City;
+use App\Models\Content;
 use App\Models\ContentCategory;
 use App\Models\CrawlData;
-use App\Models\PlaceSetting;
-use App\Models\PrivacyPolicy;
 use App\Models\Section;
 use App\Models\UrlCrawl;
 use App\Models\User;
@@ -22,8 +21,8 @@ class HomeController extends Controller
     public function index(Request $request)
     {
         $selectedCategory = $request->get('category');
-        $selectedCity = $request->get('city');
-        $selectedMonth = $request->get('month');
+        $selectedCity = $request->get('city') ?? City::where('is_current', true)->value('id');
+        $selectedMonth = $request->get('month') ?? Carbon::now()->month;
 
         $sections = Section::with([
             'contentCategory.contents' => function ($query) use ($selectedCity, $selectedMonth) {
@@ -77,13 +76,10 @@ class HomeController extends Controller
         return Inertia::render('Dashboard', [
             'stats' => [
                 'users' => User::count(),
-                'sections' => Section::count(),
                 'blogs' => Blog::count(),
-                // 'contents' => Content::count(),
-                'blogCategories' => BlogCategory::count(),
+                'contents' => Content::count(),
                 'contentCategories' => ContentCategory::count(),
-                'privacyPolicies' => PrivacyPolicy::count(),
-                'places' => PlaceSetting::count(),
+                'cities' => City::count(),
                 'urlCrawls' => UrlCrawl::count(),
             ],
             'recentBlogs' => Blog::latest()
@@ -91,7 +87,8 @@ class HomeController extends Controller
                 ->get(['id', 'title', 'created_at']),
             'dataUrlCrawl' => CrawlData::with('urlCrawl:id,name')
                 ->latest()
-                ->get(['id', 'ownerFullName', 'url', 'scraped_at', 'url_crawl_id']),
+                ->get(['id', 'ownerFullName', 'url', 'scraped_at', 'url_crawl_id'])
+                ->take(5),
         ]);
     }
 }

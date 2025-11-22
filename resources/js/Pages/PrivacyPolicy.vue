@@ -1,4 +1,5 @@
 <template>
+    <Head title="Privacy Policy" />
     <div class="bg-gray-50 min-h-screen">
         <!-- Main Content -->
         <main class="max-w-7xl mx-auto px-6 mt-6">
@@ -9,10 +10,9 @@
         </main>
     </div>
 </template>
-
 <script setup>
     import {
-        Link
+        Link, Head
     } from '@inertiajs/vue3'
     import {
         defineProps

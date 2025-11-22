@@ -1,21 +1,32 @@
 <template>
-  <div class="min-h-screen bg-[#f1f3f4] flex justify-center items-center font-inter p-4">
-    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 flex flex-col w-full max-w-2xl relative">
+  <div class="min-h-screen bg-[#f1f3f4] flex items-start md:items-center md:justify-center font-inter p-3 md:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-md transition p-5 md:p-6 flex flex-col w-full max-w-[640px] md:max-w-[760px] lg:max-w-[840px] relative">
       <!-- Header -->
-      <div class="flex justify-between items-center mb-4">
-        <div class="flex items-center gap-2 text-gray-800 font-semibold text-sm">
+      <div class="flex flex-wrap items-center justify-between gap-2 md:gap-3 mb-4">
+        <div class="flex items-center gap-2 text-gray-800 font-semibold text-sm flex-shrink-0">
           <span>{{ category.name || "Telusuri topik" }}</span>
         </div>
-        <div class="flex items-center gap-3 text-gray-600">
+        <div class="flex flex-wrap items-center justify-end gap-2 md:gap-3 text-gray-600 flex-1">
           <!-- Dropdown Bulan -->
           <select
             v-model="selectedMonth"
             @change="applyFilter"
-            class="border border-gray-300 rounded-lg text-sm px-3 py-1.5 text-gray-700 cursor-pointer"
+            class="min-w-[160px] border border-gray-300 rounded-lg text-sm px-3 py-1.5 text-gray-700 cursor-pointer"
           >
             <option value="">Bulan ini</option>
             <option v-for="month in months" :key="month.value" :value="month.value">
               {{ month.label }}
+            </option>
+          </select>
+
+          <select
+            v-model="selectedCity"
+            @change="applyFilter"
+            class="min-w-[160px] border border-gray-300 rounded-lg text-sm px-3 py-1.5 text-gray-700 cursor-pointer"
+          >
+            <option value="">Semua Kota</option>
+            <option v-for="city in cities" :key="city.id" :value="city.id">
+              {{ city.name }}
             </option>
           </select>
 
@@ -40,21 +51,18 @@
       </div>
 
       <!-- List -->
-      <ul class="divide-y divide-gray-100 flex-grow overflow-auto">
+      <ul class="divide-y divide-gray-100 md:flex-grow md:overflow-auto md:max-h-[70vh]">
         <li
           v-for="(content, idx) in category.contents"
           :key="content.id"
-          class="flex justify-between items-center py-3 hover:bg-gray-50 rounded-lg transition relative"
+          class="flex justify-between items-center py-2.5 hover:bg-gray-50 rounded-lg transition relative"
         >
           <div class="flex items-center gap-4">
-            <span class="text-gray-500 font-semibold w-5 text-center select-none">
+            <span class="text-gray-500 font-semibold w-6 text-center select-none">
               {{ idx + 1 }}
             </span>
             <div>
-              <p class="text-gray-800 font-medium leading-tight">{{ content.name }}</p>
-              <p class="text-sm text-gray-500">
-                {{ idx === 0 ? "Pesat" : "+" + (Math.random() * 3 + 1).toFixed(3) + "%" }}
-              </p>
+              <p class="text-gray-800 font-medium leading-tight truncate max-w-[220px] md:max-w-[420px]">{{ content.name }}</p>
             </div>
           </div>
 
@@ -145,11 +153,13 @@ import "dayjs/locale/id";
 const props = defineProps({
   category: Object,
   months: Array,
+  cities: Array,
   filters: Object,
 });
 
 // === State ===
 const selectedMonth = ref(props.filters?.month || "");
+const selectedCity = ref(props.filters?.city || "");
 const activeMenu = ref(null);
 const currentMonthLabel = ref("");
 const sharePopup = ref({ show: false });
@@ -168,7 +178,7 @@ watch(selectedMonth, (month) => {
 function applyFilter() {
   router.get(
     route("embed.view", { id: props.category.id }),
-    { month: selectedMonth.value },
+    { month: selectedMonth.value, city: selectedCity.value },
     { preserveScroll: true, preserveState: true, replace: true }
   );
 }
@@ -247,6 +257,10 @@ onMounted(() => {
   currentMonthLabel.value =
     props.months.find((m) => m.value === Number(selectedMonth.value))?.label ||
     dayjs().locale("id").format("MMMM");
+  if (!selectedCity.value && Array.isArray(props.cities) && props.cities.length > 0) {
+    selectedCity.value = props.cities[0].id;
+    applyFilter();
+  }
 });
 </script>
 

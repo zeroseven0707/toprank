@@ -10,8 +10,12 @@ class CustomAuthenticatedSessionController extends AuthenticatedSessionControlle
     public function store(LoginRequest $request)
     {
         $response = parent::store($request);
+        if (!auth()->check()) {
+            return redirect()->route('login')->withErrors(['email' => 'Email atau password salah.']);
+        }
         $user = auth()->user();
-        if ($user->roles[0]->name === 'User') {
+        $roleName = optional($user->roles->first())->name;
+        if ($roleName === 'User') {
             return redirect()->route('home');
         }
         return redirect()->route('dashboard');

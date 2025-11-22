@@ -17,6 +17,11 @@ class HandleInertiaRequests extends Middleware
      */
     protected $rootView = 'app';
 
+    public function rootView(Request $request): string
+    {
+        return Auth::check() ? 'admin' : 'app';
+    }
+
     /**
      * Determines the current asset version.
      *

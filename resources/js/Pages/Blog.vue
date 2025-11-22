@@ -1,4 +1,5 @@
 <template>
+  <Head title="Blog" />
   <div class="bg-gray-50 min-h-screen">
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto px-6 mt-10 mb-20">
@@ -72,7 +73,7 @@
 </template>
 
 <script setup>
-import { Link, router } from "@inertiajs/vue3";
+import { Link, router, Head } from "@inertiajs/vue3";
 
 defineProps({
   blogs: { type: Object, required: true },

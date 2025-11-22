@@ -1,23 +1,19 @@
 <template>
-    <footer class="content-footer footer bg-footer-theme">
-        <div class="container-xxl">
-            <div class="footer-container d-flex align-items-center justify-content-between py-4 flex-md-row flex-column">
-                <div class="text-body">
-                    © 2025 , made with ❤️ by <a href="https://pixinvent.com" target="_blank" class="footer-link">Pixinvent</a>
-                </div>
-                <div class="d-none d-lg-inline-block">
-                    <a href="https://themeforest.net/licenses/standard" class="footer-link me-4"
-                        target="_blank">License</a>
-                    <a href="https://1.envato.market/pixinvent_portfolio" target="_blank" class="footer-link me-4">More
-                        Themes</a>
-
-                    <a href="https://demos.pixinvent.com/vuexy-html-admin-template/documentation/" target="_blank"
-                        class="footer-link me-4">Documentation</a>
-
-                    <a href="https://pixinvent.ticksy.com/" target="_blank"
-                        class="footer-link d-none d-sm-inline-block">Support</a>
-                </div>
-            </div>
+  <footer class="content-footer footer bg-footer-theme">
+    <div class="container-xxl">
+      <div class="footer-container d-flex align-items-center justify-content-between py-4 flex-md-row flex-column">
+        <div class="text-body">
+          © {{ year }} , dibuat oleh <a href="/" class="footer-link">TopRank</a>
         </div>
-    </footer>
+        <div class="d-none d-lg-inline-block">
+          <a href="/privacy-policy" class="footer-link me-4">Privacy Policy</a>
+          <a href="/help" class="footer-link me-4">Help</a>
+        </div>
+      </div>
+    </div>
+  </footer>
 </template>
+
+<script setup>
+const year = new Date().getFullYear()
+</script>

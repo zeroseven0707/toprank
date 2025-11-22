@@ -71,19 +71,20 @@
                   {{ blog.status }}
                 </span>
               </td>
-              <td class="text-center">
-                <Link
-                  :href="`/admin/blogs/${blog.id}/edit`"
-                  class="btn btn-sm btn-icon btn-outline-primary me-1"
-                >
-                  <i class="ti ti-pencil"></i>
-                </Link>
-                <button
-                  @click="deleteBlog(blog.id)"
-                  class="btn btn-sm btn-icon btn-outline-danger"
-                >
-                  <i class="ti ti-trash"></i>
-                </button>
+              <td class="text-center position-relative">
+                <div class="dropdown">
+                  <button class="btn btn-sm btn-light" @click.stop="toggleMenu(blog.id)">
+                    <i class="ti ti-dots-vertical"></i>
+                  </button>
+                  <div v-if="openMenuId === blog.id" class="dropdown-menu show" style="position:absolute; right:0; z-index:10;">
+                    <Link :href="`/admin/blogs/${blog.id}/edit`" class="dropdown-item">
+                      <i class="ti ti-edit me-1"></i> Edit
+                    </Link>
+                    <button class="dropdown-item text-danger" @click.prevent="deleteBlog(blog.id)">
+                      <i class="ti ti-trash me-1"></i> Hapus
+                    </button>
+                  </div>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -115,6 +116,7 @@
 <script setup>
 import { router, Link } from "@inertiajs/vue3";
 import { usePage } from "@inertiajs/vue3";
+import { ref } from "vue";
 const props = defineProps({
   blogs: Object,
 });
@@ -122,6 +124,8 @@ const props = defineProps({
 const page = usePage();
 console.log('Auth from Inertia:', page.props.auth);
 
+const openMenuId = ref(null);
+const toggleMenu = (id) => { openMenuId.value = openMenuId.value === id ? null : id };
 const deleteBlog = (id) => {
   if (confirm("Are you sure you want to delete this blog?")) {
     router.delete(`/blogs/${id}`);
@@ -135,6 +139,8 @@ const nextPage = () => {
 const previousPage = () => {
   if (props.blogs.prev_page_url) router.visit(props.blogs.prev_page_url);
 };
+
+document.addEventListener('click', (e) => { if (!e.target.closest('.dropdown')) openMenuId.value = null; });
 
 </script>
 

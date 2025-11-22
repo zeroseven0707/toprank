@@ -1,7 +1,7 @@
 <script setup>
 import { Head, Link, useForm } from '@inertiajs/vue3';
 import AuthenticationCard from '@/Components/AuthenticationCard.vue';
-import AuthenticationCardLogo from '@/Components/AuthenticationCardLogo.vue';
+
 import Checkbox from '@/Components/Checkbox.vue';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -27,9 +27,10 @@ const submit = () => {
     <Head title="Register" />
 
     <AuthenticationCard>
-        <template #logo>
-            <AuthenticationCardLogo />
-        </template>
+        <div class="text-center mb-4">
+            <h2 class="text-xl font-semibold text-gray-800">Daftar</h2>
+            <p class="text-sm text-gray-500">Buat akun baru untuk mulai menggunakan TopRank</p>
+        </div>
 
         <form @submit.prevent="submit">
             <div>
